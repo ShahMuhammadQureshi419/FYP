@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>APK Analysis Results</title>
+    <style>
+        .result-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>APK Analysis Results</h1>
+    
+    <div>
+        <a href="/download/{{ file_name }}/pdf">
+            <button>Download PDF Report</button>
+        </a>
+        <a href="/download/{{ file_name }}/json">
+            <button>Download JSON Report</button>
+        </a>
+    </div>
+    
+    <h2>Static Analysis Results</h2>
+    
+    <div class="result-section">
+        <h3>Basic Information</h3>
+        <pre>{{ json_results | tojson(indent=4) }}</pre>
+    </div>
+    
+    <a href="/">Analyze another APK</a>
+</body>
+</html>

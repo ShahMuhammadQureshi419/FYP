@@ -1,0 +1,16 @@
+# index.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>APK Analyzer</title>
+</head>
+<body>
+    <h1>Upload APK for Analysis</h1>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".apk" required>
+        <button type="submit">Upload APK</button>
+    </form>
+    <p>Maximum file size: 80MB</p>
+</body>
+</html>
