@@ -4,8 +4,10 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from mobsf_analyzer import MobSFClient
+from mobsf_json_parser import extract_mobsf_summary
 import os
 import json
+
 
 # object definations
 app = Flask(__name__)
@@ -54,21 +56,30 @@ def upload_file():
         
     return 'Invalid file or analysis failed', 400
 
+
+
 @app.route('/results/<file_name>/<file_hash>')
 def results(file_name, file_hash):
+
     pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{file_name}_report.pdf')
     json_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{file_name}_report.json')
-    
-    # Load JSON results
-    json_results = {}
+
+    context = {
+        'file_name': file_name,
+        'file_hash': file_hash,
+        'pdf_exists': os.path.exists(pdf_path),
+        'report': None,
+        'error': None
+    }
+
     if os.path.exists(json_path):
-        with open(json_path, 'r') as f:
-            json_results = json.load(f)
-    
-    return render_template('results.html',
-                         file_name=file_name,
-                         file_hash=file_hash,
-                         json_results=json_results)
+        try:
+            context['report'] = extract_mobsf_summary(json_path)  # Use the parser
+        except Exception as e:
+            context['error'] = f"Report processing failed: {str(e)}"
+            
+
+    return render_template('results.html', **context)
 
 
 @app.route('/download/<file_name>/<report_type>')
@@ -82,4 +93,4 @@ def download_report(file_name, report_type):
     )
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5050, debug=True)
