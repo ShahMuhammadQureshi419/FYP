@@ -1,130 +1,16 @@
-{% extends "layout.html" %}
+# index.html
 
-{% block title %}Upload APK{% endblock %}
-
-{% block content %}
-<div class="cyber-panel">
-    <div class="cyber-panel-header">
-        <i class="fas fa-upload"></i> Upload APK for Analysis
-    </div>
-    <div class="cyber-panel-body">
-        <div class="row">
-            <div class="col-lg-7">
-                <div class="cyber-upload-container" id="dropZone">
-                    <div class="upload-icon">
-                        <i class="fas fa-file-upload"></i>
-                    </div>
-                    <div class="upload-text">
-                        <h3>Drag & Drop APK File Here</h3>
-                        <p>or</p>
-                        <label for="fileInput" class="cyber-button">
-                            <span class="cyber-button-text">Select APK File</span>
-                        </label>
-                        <input type="file" id="fileInput" accept=".apk" class="d-none">
-                    </div>
-                    <div class="upload-restrictions">
-                        <p><i class="fas fa-info-circle"></i> Maximum size: 50MB</p>
-                        <p><i class="fas fa-file-code"></i> Only .apk files accepted</p>
-                    </div>
-                </div>
-                
-                <!-- Upload progress and status -->
-                <div class="upload-status-container mt-4 d-none" id="uploadStatus">
-                    <div class="cyber-progress-wrapper">
-                        <div class="cyber-progress-label">
-                            <span>Uploading: </span>
-                            <span id="fileNameLabel">filename.apk</span>
-                        </div>
-                        <div class="cyber-progress">
-                            <div class="cyber-progress-bar" id="uploadProgressBar" style="width: 0%"></div>
-                        </div>
-                        <div class="cyber-progress-status">
-                            <span id="uploadStatusText">Initializing...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Analysis progress (shown after upload) -->
-                <div class="analysis-status-container mt-4 d-none" id="analysisStatus">
-                    <div class="cyber-progress-wrapper">
-                        <div class="cyber-progress-label">
-                            <span>Analyzing: </span>
-                            <span id="analysisFileNameLabel">filename.apk</span>
-                        </div>
-                        <div class="cyber-progress position-relative">
-                            <div class="cyber-progress-bar cyber-progress-bar-scanning" id="analysisProgressBar"></div>
-                        </div>
-                        <div class="cyber-progress-status">
-                            <span id="analysisStatusText">Static analysis in progress...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-5">
-                <div class="cyber-info-panel">
-                    <div class="cyber-info-panel-header">
-                        <i class="fas fa-shield-alt"></i> APK Scanner Features
-                    </div>
-                    <div class="cyber-info-panel-body">
-                        <ul class="cyber-feature-list">
-                            <li>
-                                <i class="fas fa-search"></i>
-                                <div>
-                                    <h5>Static Analysis</h5>
-                                    <p>Examines code patterns, permissions, and app structure</p>
-                                </div>
-                            </li>
-                            <li>
-                                <i class="fas fa-running"></i>
-                                <div>
-                                    <h5>Dynamic Analysis</h5>
-                                    <p>Analyzes app behavior, network traffic, and system interactions</p>
-                                </div>
-                            </li>
-                            <li>
-                                <i class="fas fa-bug"></i>
-                                <div>
-                                    <h5>Vulnerability Detection</h5>
-                                    <p>Identifies known security vulnerabilities</p>
-                                </div>
-                            </li>
-                            <li>
-                                <i class="fas fa-chart-line"></i>
-                                <div>
-                                    <h5>Detailed Reports</h5>
-                                    <p>Comprehensive security assessment with visual representations</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Error modal -->
-<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content cyber-modal">
-            <div class="modal-header cyber-modal-header">
-                <h5 class="modal-title" id="errorModalLabel">
-                    <i class="fas fa-exclamation-triangle"></i> Error
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body cyber-modal-body">
-                <p id="errorModalText">An error occurred.</p>
-            </div>
-            <div class="modal-footer cyber-modal-footer">
-                <button type="button" class="cyber-button" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>APK Analyzer</title>
+</head>
+<body>
+    <h1>Upload APK for Analysis</h1>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".apk" required>
+        <button type="submit">Upload APK</button>
+    </form>
+    <p>Maximum file size: 80MB</p>
+</body>
+</html>
