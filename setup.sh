@@ -28,14 +28,20 @@ else
     docker run -d --name mobsf -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest
 fi
 
-# Step 4: Create virtual environment
+# Step 4: Use Python 3.11 if available
+PYTHON_BIN=$(command -v python3.11 || command -v python3)
+
+echo "[+] Using Python interpreter: $PYTHON_BIN"
+
+# Step 5: Create virtual environment
 echo "[+] Creating Python virtual environment: InfectTest-env"
-python3 -m venv InfectTest-env
+$PYTHON_BIN -m venv InfectTest-env
 source InfectTest-env/bin/activate
 
-# Step 5: Install Python dependencies
+# Step 6: Install Python dependencies
 echo "[+] Installing Python dependencies..."
-pip install --upgrade pip
+pip install --upgrade pip setuptools wheel
+
 pip install -r requirements.txt
 if [ $? -ne 0 ]; then
     echo "[!] Failed to install Python dependencies."
@@ -43,9 +49,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Step 6: Run the main application
+# Step 7: Run the main application
 echo "[+] Launching InfectTest..."
-python3 main.py
+$PYTHON_BIN main.py
 
 # Done
 echo "[+] InfectTest setup complete. MobSF is running at http://localhost:8000"
