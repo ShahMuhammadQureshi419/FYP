@@ -1,38 +1,173 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>APK Analysis Results</title>
+    <title>APK Analysis Results - {{ report.app_name if report else file_name }}</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
         .result-section {
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 15px;
             border: 1px solid #ddd;
+            border-radius: 5px;
         }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
+
+        .security-score {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .safe { background-color: #d4edda; color: #155724; }
+        .risky { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dangerous { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        button {
+            padding: 8px 12px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+
     <h1>APK Analysis Results</h1>
-    
-    <div>
-        <a href="/download/{{ file_name }}/pdf">
-            <button>Download PDF Report</button>
-        </a>
-        <a href="/download/{{ file_name }}/json">
-            <button>Download JSON Report</button>
-        </a>
-    </div>
-    
-    <h2>Static Analysis Results</h2>
-    
+
+    <!-- Show Basic Details Even Without a Report -->
     <div class="result-section">
-        <h3>Basic Information</h3>
-        <pre>{{ json_results | tojson(indent=4) }}</pre>
+        <p><strong>File Name:</strong> {{ file_name }}</p>
+        <p><strong>File Hash:</strong> {{ file_hash }}</p>
     </div>
-    
-    <a href="/">Analyze another APK</a>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        <strong>Error:</strong> {{ error }}
+        {% if raw_json %}
+            <br><button onclick="toggleRawJson()">Show Raw JSON</button>
+            <pre id="rawJson" style="display:none">{{ raw_json | tojson(indent=4) }}</pre>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if report %}
+        <!-- Basic App Info -->
+        <div class="result-section">
+            <h2>{{ report.app_name or 'Unknown App' }}</h2>
+            <p><strong>Scan Date:</strong> {{ report.scan_date or 'N/A' }}</p>
+            <p><strong>Size:</strong> {{ report.file_size or 'N/A' }}</p>
+            <p><strong>Package:</strong> {{ report.main_activity or 'N/A' }}</p>
+        </div>
+
+        <!-- Security Score -->
+        <div class="security-score {{ 'safe' if report.security_score >= 70 else 'warning' if report.security_score >= 50 else 'risky' }}">
+            Security Score: {{ report.security_score }}/100
+        </div>
+
+        <!-- Severity Summary -->
+        {% if report.severity_summary %}
+        <div class="result-section">
+            <h3>Issues Found</h3>
+            <table>
+                <tr>
+                    <th>High Risk</th>
+                    <th>Warnings</th>
+                    <th>Secure</th>
+                    <th>Info</th>
+                </tr>
+                <tr>
+                    <td>{{ report.severity_summary.high }}</td>
+                    <td>{{ report.severity_summary.warning }}</td>
+                    <td>{{ report.severity_summary.secure }}</td>
+                    <td>{{ report.severity_summary.info }}</td>
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Trackers Detected -->
+        {% if report.trackers_detected > 0 %}
+        <div class="result-section">
+            <h3>Trackers Detected ({{ report.trackers_detected }}/{{ report.total_trackers }})</h3>
+            <ul>
+                {% for tracker in report.trackers %}
+                <li>
+                    <strong>{{ tracker.name }}</strong> — 
+                    {{ tracker.categories | join(', ') }}
+                    {% if tracker.url %}(<a href="{{ tracker.url }}" target="_blank">more info</a>){% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Dangerous Permissions -->
+        {% if report.dangerous_and_warning_permissions %}
+        <div class="result-section">
+            <h3>Critical Permissions</h3>
+            <table>
+                <tr>
+                    <th>Permission</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                </tr>
+                {% for perm in report.dangerous_and_warning_permissions %}
+                <tr class="{{ perm.status }}">
+                    <td>{{ perm.permission }}</td>
+                    <td>{{ perm.status | capitalize }}</td>
+                    <td>{{ perm.description }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Download Links -->
+        <div class="result-section">
+            <h3>Download Reports</h3>
+            {% if pdf_exists %}
+                <a href="/download/{{ file_name }}/pdf" download>
+                    <button>Download PDF Report</button>
+                </a>
+            {% endif %}
+            <a href="/download/{{ file_name }}/json" download>
+                <button>Download JSON Report</button>
+            </a>
+        </div>
+    {% endif %}
+
+    <a href="/">🔄 Analyze another APK</a>
+
+    <script>
+        function toggleRawJson() {
+            const el = document.getElementById('rawJson');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>
