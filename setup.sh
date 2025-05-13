@@ -1,4 +1,4 @@
-#!/bin/bash
+    #!/bin/bash
 
 echo "[+] Starting InfectTest setup..."
 echo "[+] Long live open source!"
@@ -40,15 +40,20 @@ fi
 PYTHON_BIN=$(command -v python3.11 || command -v python3)
 echo "[+] Using Python interpreter: $PYTHON_BIN"
 
-# Step 5: Create virtual environment
-echo "[+] Creating Python virtual environment: InfectTest-env"
-$PYTHON_BIN -m venv InfectTest-env
+# Step 5: Create virtual environment if not already present
+if [ ! -d "InfectTest-env" ]; then
+    echo "[+] Creating Python virtual environment: InfectTest-env"
+    $PYTHON_BIN -m venv InfectTest-env
+else
+    echo "[+] Virtual environment already exists: InfectTest-env"
+fi
+
+# Activate virtual environment
 source InfectTest-env/bin/activate
 
 # Step 6: Install Python dependencies
 echo "[+] Installing Python dependencies..."
 pip install --upgrade pip setuptools wheel
-
 pip install -r requirements.txt
 if [ $? -ne 0 ]; then
     echo "[!] Failed to install Python dependencies."
