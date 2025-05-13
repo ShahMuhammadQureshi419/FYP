@@ -17,6 +17,14 @@ else
     echo "[+] MobSF Docker image already available locally."
 fi
 
+# Step 2.5: Check if AndroPyTool image exists locally
+if [[ "$(docker images -q alexmyg/andropytool:latest 2> /dev/null)" == "" ]]; then
+    echo "[+] AndroPyTool image not found locally. Pulling from Docker Hub..."
+    docker pull alexmyg/andropytool:latest
+else
+    echo "[+] AndroPyTool Docker image already available locally."
+fi
+
 # Step 3: Start MobSF container (if not already running)
 if [ "$(docker ps -q -f name=mobsf)" ]; then
     echo "[+] MobSF container is already running."
@@ -30,7 +38,6 @@ fi
 
 # Step 4: Use Python 3.11 if available
 PYTHON_BIN=$(command -v python3.11 || command -v python3)
-
 echo "[+] Using Python interpreter: $PYTHON_BIN"
 
 # Step 5: Create virtual environment
