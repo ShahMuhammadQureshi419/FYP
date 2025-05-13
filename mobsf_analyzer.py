@@ -7,10 +7,17 @@ import json
 from flask import jsonify
 
 class MobSFClient:
+    
+    @staticmethod
+    def just_opening_file(file_path, mode):
+        
+        with open(file_path, mode, encoding='utf-8') as file:
+            return file.read()
+
     # the default constructor
     def __init__(self):
         self.MOBSF_URL = "http://localhost:8000"  # MobSF instance URL
-        self.API_KEY = "190c7bf6c205bedd87591922b07844c33884a0f958061fe68c7eaaf864a26e12"  # my API key
+        self.API_KEY = self.just_opening_file('config/mobsf_api_key.txt', 'r').strip()                # my API key
         self.UPLOAD_FOLDER = 'uploads'      # uploads_apk_folder
         os.makedirs(self.UPLOAD_FOLDER, exist_ok=True)
 
