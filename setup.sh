@@ -1,5 +1,5 @@
 #!/bin/bash
-# this is working in mehdi badamis contribution right now 
+
 echo "[+] Starting InfectTest setup..."
 echo "[+] Long live open source!"
 
@@ -36,22 +36,34 @@ else
     docker run -d --name mobsf -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest
 fi
 
-# Step 4: Use Python 3.11 forcefully
+# Step 4: Use Python 3.11 if available
 PYTHON_BIN=$(command -v python3.11 || command -v python3)
+
+if [ -z "$PYTHON_BIN" ]; then
+    echo "[!] Python 3.11 is not installed. Please install it first."
+    exit 1
+fi
+
 echo "[+] Using Python interpreter: $PYTHON_BIN"
 
 # Step 5: Create virtual environment if not already present
-if [ ! -d "InfectTest-env" ]; then
-    echo "[+] Creating Python virtual environment: InfectTest-env"
-    $PYTHON_BIN -m venv InfectTest-env
+VENV_DIR="InfectTest-env"
+if [ ! -d "$VENV_DIR" ]; then
+    echo "[+] Creating Python virtual environment: $VENV_DIR"
+    $PYTHON_BIN -m venv "$VENV_DIR"
+    if [ $? -ne 0 ]; then
+        echo "[!] Failed to create virtual environment."
+        exit 1
+    fi
 else
-    echo "[+] Virtual environment already exists: InfectTest-env"
+    echo "[+] Virtual environment already exists: $VENV_DIR"
 fi
 
-# Activate virtual environment
-source InfectTest-env/bin/activate
+# Step 6: Activate virtual environment
+echo "[+] Activating virtual environment..."
+source "$VENV_DIR/bin/activate"
 
-# Step 6: Install Python dependencies
+# Step 7: Install Python dependencies
 echo "[+] Installing Python dependencies..."
 pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
@@ -61,9 +73,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Step 7: Run the main application
+# Step 8: Run the main application
 echo "[+] Launching InfectTest..."
-$PYTHON_BIN main.py
+export XGBOOST_VERBOSITY=0
+python main.py
 
 # Done
 echo "[+] InfectTest setup complete. MobSF is running at http://localhost:8000"
