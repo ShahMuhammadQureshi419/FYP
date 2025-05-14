@@ -3,10 +3,14 @@ from werkzeug.utils import secure_filename
 from mobsf_analyzer import MobSFClient
 from mobsf_json_parser import extract_mobsf_summary
 from andropytool_lib import AndroPyToolClient
+from ml_predictor import MLPredictor
 from datetime import datetime
 import os
 import json
 import shutil
+
+# Initialize the ML predictor
+predictor = MLPredictor()
 
 # Flask app and analysis clients
 app = Flask(__name__)
@@ -71,7 +75,7 @@ def upload_file():
             json_report = f'{file_name}_report.json'
             pdf_report = f'{file_name}_report.pdf'
 
-            # Run AndroPyTool (uses same apk_path, output into a subdir)
+            # Run AndroPyTool
             try:
                 andropy_output_dir = os.path.join(subfolder_path, 'andropy_output')
                 os.makedirs(andropy_output_dir, exist_ok=True)
@@ -79,6 +83,31 @@ def upload_file():
                 print("[+] AndroPyTool analysis completed.")
             except Exception as e:
                 print(f"[!] AndroPyTool analysis failed: {e}")
+
+            # Load features and run ML prediction
+            # Load features and run ML prediction (robust feature file detection)
+            features_dir = os.path.join(subfolder_path, 'Features_files')
+            if os.path.exists(features_dir):
+                feature_files = [
+                    f for f in os.listdir(features_dir)
+                    if f.endswith('-analysis.json') and not f.startswith('OUTPUT_ANDROPY')
+                ]
+
+                if feature_files:
+                    features_path = os.path.join(features_dir, feature_files[0])
+                    print(f"[INFO] Using feature file for prediction: {features_path}")
+                    try:
+                        prediction_result = predictor.predict_all(features_path)
+                        print("[+] ML prediction:", prediction_result)
+                        with open(os.path.join(subfolder_path, 'ml_prediction.json'), 'w') as f:
+                            json.dump(prediction_result, f, indent=2)
+                    except Exception as e:
+                        print(f"[!] ML prediction failed: {e}")
+                else:
+                    print("[WARNING] No valid feature file found in Features_files.")
+            else:
+                print("[WARNING] Features_files directory not found.")
+
 
             # Move MobSF reports to subfolder
             root_json = os.path.join(app.config['UPLOAD_FOLDER'], json_report)
@@ -90,11 +119,8 @@ def upload_file():
 
             return redirect(url_for('results',
                                     file_name=file_name,
-                                    file_hash=result['file_hash'],
-                                    folder=subfolder_name))
+                                    file_hash=result['file_hash']))
 
-
-    
     return 'Invalid file or analysis failed', 400
 
 # Result display route
@@ -107,12 +133,14 @@ def results(file_name, file_hash):
     subfolder_path = os.path.join(app.config['UPLOAD_FOLDER'], folder)
     pdf_path = os.path.join(subfolder_path, f'{file_name}_report.pdf')
     json_path = os.path.join(subfolder_path, f'{file_name}_report.json')
+    prediction_path = os.path.join(subfolder_path, 'ml_prediction.json')
 
     context = {
         'file_name': file_name,
         'file_hash': file_hash,
         'pdf_exists': os.path.exists(pdf_path),
         'report': None,
+        'prediction': None,
         'error': None
     }
 
@@ -121,6 +149,13 @@ def results(file_name, file_hash):
             context['report'] = extract_mobsf_summary(json_path)
         except Exception as e:
             context['error'] = f"Failed to parse MobSF JSON: {str(e)}"
+
+    if os.path.exists(prediction_path):
+        try:
+            with open(prediction_path, 'r') as f:
+                context['prediction'] = json.load(f)
+        except Exception as e:
+            context['error'] = f"Failed to parse prediction results: {str(e)}"
 
     return render_template('results.html', **context)
 
