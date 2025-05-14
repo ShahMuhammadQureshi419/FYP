@@ -71,6 +71,15 @@ def upload_file():
             json_report = f'{file_name}_report.json'
             pdf_report = f'{file_name}_report.pdf'
 
+            # Run AndroPyTool (uses same apk_path, output into a subdir)
+            try:
+                andropy_output_dir = os.path.join(subfolder_path, 'andropy_output')
+                os.makedirs(andropy_output_dir, exist_ok=True)
+                andropy.run_analysis(apk_path, andropy_output_dir)
+                print("[+] AndroPyTool analysis completed.")
+            except Exception as e:
+                print(f"[!] AndroPyTool analysis failed: {e}")
+
             # Move MobSF reports to subfolder
             root_json = os.path.join(app.config['UPLOAD_FOLDER'], json_report)
             root_pdf = os.path.join(app.config['UPLOAD_FOLDER'], pdf_report)
@@ -84,14 +93,6 @@ def upload_file():
                                     file_hash=result['file_hash'],
                                     folder=subfolder_name))
 
-            # Run AndroPyTool (uses same apk_path, output into a subdir)
-            try:
-                andropy_output_dir = os.path.join(subfolder_path, 'andropy_output')
-                os.makedirs(andropy_output_dir, exist_ok=True)
-                andropy.run_analysis(apk_path, andropy_output_dir)
-                print("[+] AndroPyTool analysis completed.")
-            except Exception as e:
-                print(f"[!] AndroPyTool analysis failed: {e}")
 
     
     return 'Invalid file or analysis failed', 400
