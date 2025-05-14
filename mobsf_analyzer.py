@@ -7,14 +7,15 @@ import json
 from flask import jsonify
 
 class MobSFClient:
-    
+    # the default constructor
+
     @staticmethod
     def just_opening_file(file_path, mode):
         
         with open(file_path, mode, encoding='utf-8') as file:
             return file.read()
 
-    # the default constructor
+
     def __init__(self):
         self.MOBSF_URL = "http://localhost:8000"  # MobSF instance URL
         self.API_KEY = self.just_opening_file('config/mobsf_api_key.txt', 'r').strip()                # my API key
