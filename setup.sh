@@ -37,7 +37,7 @@ else
 fi
 
 # Step 4: Use Python 3.11 if available
-PYTHON_BIN=$(command -v python3.11)
+PYTHON_BIN=$(command -v python3.11 || command -v python3)
 
 if [ -z "$PYTHON_BIN" ]; then
     echo "[!] Python 3.11 is not installed. Please install it first."
