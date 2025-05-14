@@ -1,4 +1,4 @@
-    #!/bin/bash
+#!/bin/bash
 
 echo "[+] Starting InfectTest setup..."
 echo "[+] Long live open source!"
@@ -30,7 +30,7 @@ if [ "$(docker ps -q -f name=mobsf)" ]; then
     echo "[+] MobSF container is already running."
 elif [ "$(docker ps -aq -f status=exited -f name=mobsf)" ]; then
     echo "[+] Starting existing stopped MobSF container..."
-    docker start mobsf
+    docker start mobsf 
 else
     echo "[+] Launching new MobSF container..."
     docker run -d --name mobsf -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest
