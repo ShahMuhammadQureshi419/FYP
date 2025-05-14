@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# this is working in mehdi badamis contribution right now 
 echo "[+] Starting InfectTest setup..."
 echo "[+] Long live open source!"
 
@@ -37,7 +37,7 @@ else
 fi
 
 # Step 4: Use Python 3.11 forcefully
-PYTHON_BIN=$(command -v python3.11)
+PYTHON_BIN=$(command -v python3.11 || command -v python3)
 echo "[+] Using Python interpreter: $PYTHON_BIN"
 
 # Step 5: Create virtual environment if not already present
