@@ -1,5 +1,3 @@
-# andropytool_lib.py
-
 import os
 import subprocess
 
