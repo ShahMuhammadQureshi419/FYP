@@ -36,8 +36,8 @@ else
     docker run -d --name mobsf -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest
 fi
 
-# Step 4: Use Python 3.11 if available
-PYTHON_BIN=$(command -v python3.11 || command -v python3)
+# Step 4: Use Python 3.11 forcefully
+PYTHON_BIN=$(command -v python3.11)
 echo "[+] Using Python interpreter: $PYTHON_BIN"
 
 # Step 5: Create virtual environment if not already present
