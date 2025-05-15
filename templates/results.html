@@ -1,173 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>APK Analysis Results - {{ report.app_name if report else file_name }}</title>
+    <meta charset="UTF-8">
+    <title>Analysis Results - InfectTest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f9f9f9;
         }
 
-        .result-section {
-            margin-bottom: 20px;
+        .container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        p, li {
+            color: #555;
+        }
+
+        pre {
+            background: #f4f4f4;
             padding: 15px;
-            border: 1px solid #ddd;
             border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
         }
 
-        .security-score {
-            font-size: 1.2em;
-            font-weight: bold;
-            padding: 10px;
-            text-align: center;
-            margin: 20px 0;
+        ul {
+            list-style: none;
+            padding-left: 0;
         }
 
-        .safe { background-color: #d4edda; color: #155724; }
-        .risky { background-color: #f8d7da; color: #721c24; }
-        .warning { background-color: #fff3cd; color: #856404; }
+        ul li {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #fefefe;
+            border-left: 4px solid #17a2b8;
+            border-radius: 4px;
+        }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
         }
 
         th, td {
-            padding: 8px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
-        .dangerous { color: #dc3545; }
-        .warning { color: #ffc107; }
-        .info { color: #17a2b8; }
-
-        .alert {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+        th {
+            background-color: #f1f1f1;
         }
 
-        .alert-danger { background-color: #f8d7da; color: #721c24; }
-        button {
-            padding: 8px 12px;
+        .dangerous {
+            color: #dc3545;
+        }
+
+        .warning {
+            color: #ffc107;
+        }
+
+        .info {
+            color: #17a2b8;
+        }
+
+        a.button-link {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
             margin-top: 10px;
+        }
+
+        a.button-link:hover {
+            background-color: #0056b3;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Analysis Results</h1>
+        <p><strong>File:</strong> {{ file_name }}</p>
+        <p><strong>Hash:</strong> {{ file_hash }}</p>
 
-    <h1>APK Analysis Results</h1>
-
-    <!-- Show Basic Details Even Without a Report -->
-    <div class="result-section">
-        <p><strong>File Name:</strong> {{ file_name }}</p>
-        <p><strong>File Hash:</strong> {{ file_hash }}</p>
-    </div>
-
-    {% if error %}
-    <div class="alert alert-danger">
-        <strong>Error:</strong> {{ error }}
-        {% if raw_json %}
-            <br><button onclick="toggleRawJson()">Show Raw JSON</button>
-            <pre id="rawJson" style="display:none">{{ raw_json | tojson(indent=4) }}</pre>
-        {% endif %}
-    </div>
-    {% endif %}
-
-    {% if report %}
-        <!-- Basic App Info -->
-        <div class="result-section">
-            <h2>{{ report.app_name or 'Unknown App' }}</h2>
-            <p><strong>Scan Date:</strong> {{ report.scan_date or 'N/A' }}</p>
-            <p><strong>Size:</strong> {{ report.file_size or 'N/A' }}</p>
-            <p><strong>Package:</strong> {{ report.main_activity or 'N/A' }}</p>
-        </div>
-
-        <!-- Security Score -->
-        <div class="security-score {{ 'safe' if report.security_score >= 70 else 'warning' if report.security_score >= 50 else 'risky' }}">
-            Security Score: {{ report.security_score }}/100
-        </div>
-
-        <!-- Severity Summary -->
-        {% if report.severity_summary %}
-        <div class="result-section">
-            <h3>Issues Found</h3>
-            <table>
-                <tr>
-                    <th>High Risk</th>
-                    <th>Warnings</th>
-                    <th>Secure</th>
-                    <th>Info</th>
-                </tr>
-                <tr>
-                    <td>{{ report.severity_summary.high }}</td>
-                    <td>{{ report.severity_summary.warning }}</td>
-                    <td>{{ report.severity_summary.secure }}</td>
-                    <td>{{ report.severity_summary.info }}</td>
-                </tr>
-            </table>
-        </div>
+        {% if prediction %}
+            <h2>ML Prediction</h2>
+            <pre>{{ prediction | tojson(indent=2) }}</pre>
+        {% else %}
+            <p class="highlight">No ML prediction available.</p>
         {% endif %}
 
-        <!-- Trackers Detected -->
-        {% if report.trackers_detected > 0 %}
-        <div class="result-section">
-            <h3>Trackers Detected ({{ report.trackers_detected }}/{{ report.total_trackers }})</h3>
+        {% if report %}
+            <h2>MobSF Summary</h2>
             <ul>
-                {% for tracker in report.trackers %}
-                <li>
-                    <strong>{{ tracker.name }}</strong> — 
-                    {{ tracker.categories | join(', ') }}
-                    {% if tracker.url %}(<a href="{{ tracker.url }}" target="_blank">more info</a>){% endif %}
-                </li>
+                {% for key, value in report.items() %}
+                    {% if key != 'dangerous_and_warning_permissions' %}
+                        <li><strong>{{ key.replace('_', ' ') | title }}:</strong> {{ value }}</li>
+                    {% endif %}
                 {% endfor %}
             </ul>
-        </div>
-        {% endif %}
 
-        <!-- Dangerous Permissions -->
-        {% if report.dangerous_and_warning_permissions %}
-        <div class="result-section">
-            <h3>Critical Permissions</h3>
-            <table>
-                <tr>
-                    <th>Permission</th>
-                    <th>Status</th>
-                    <th>Description</th>
-                </tr>
-                {% for perm in report.dangerous_and_warning_permissions %}
-                <tr class="{{ perm.status }}">
-                    <td>{{ perm.permission }}</td>
-                    <td>{{ perm.status | capitalize }}</td>
-                    <td>{{ perm.description }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
-
-        <!-- Download Links -->
-        <div class="result-section">
-            <h3>Download Reports</h3>
-            {% if pdf_exists %}
-                <a href="/download/{{ file_name }}/pdf" download>
-                    <button>Download PDF Report</button>
-                </a>
+            {% if report.dangerous_and_warning_permissions %}
+                <h3>Dangerous and Warning Permissions</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Permission</th>
+                            <th>Status</th>
+                            <th>Info</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perm in report.dangerous_and_warning_permissions %}
+                        <tr class="{{ perm.status }}">
+                            <td>{{ perm.permission }}</td>
+                            <td class="{{ perm.status }}">{{ perm.status | capitalize }}</td>
+                            <td>{{ perm.info }}</td>
+                            <td>{{ perm.description }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
-            <a href="/download/{{ file_name }}/json" download>
-                <button>Download JSON Report</button>
-            </a>
+        {% else %}
+            <p class="highlight">No MobSF report available.</p>
+        {% endif %}
+
+        {% if pdf_exists %}
+            <a class="button-link" href="{{ url_for('download_report', file_name=file_name, report_type='pdf', folder=folder) }}" target="_blank">Download PDF Report</a>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">🔄 Analyze another APK</a>
         </div>
-    {% endif %}
-
-    <a href="/">🔄 Analyze another APK</a>
-
-    <script>
-        function toggleRawJson() {
-            const el = document.getElementById('rawJson');
-            el.style.display = el.style.display === 'none' ? 'block' : 'none';
-        }
-    </script>
+    </div>
 </body>
 </html>
