@@ -38,129 +38,127 @@
       background: rgba(59, 130, 246, 0.1);
     }
   </style>
+  <script>
+    async function uploadAPK(event) {
+      event.preventDefault();
+      const form = document.getElementById('upload-form');
+      const formData = new FormData(form);
+      const status = document.getElementById('status');
+      status.innerText = 'Uploading...';
+
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const text = await response.text();
+        console.log("Raw response:", text);
+
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error("Failed to parse JSON:", e);
+          status.innerText = 'Server error: Invalid response';
+          return;
+        }
+
+        if (result.redirect_url) {
+          window.location.href = result.redirect_url;
+        } else {
+          status.innerText = result.error || 'Upload failed.';
+        }
+      } catch (err) {
+        console.error("Upload error:", err);
+        status.innerText = 'Uploading...';
+      }
+    }
+  </script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-500">
-  <header class="bg-white dark:bg-gray-800 shadow-md py-4 px-6 fixed w-full top-0 z-50 transition-all">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 shadow-md py-4 px-6 fixed w-full top-0 z-50">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400 orbitron">InfectTest</h1>
+      <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400 font-orbitron">InfectTest</h1>
       <div class="flex items-center space-x-4">
         <button id="darkModeToggle" class="bg-gray-200 dark:bg-gray-700 text-sm px-3 py-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition">Toggle Dark Mode</button>
-        <a href="https://github.com/Binary-Assassin/InfectTest" target="_blank" class="flex items-center bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+        <a href="https://github.com/ShahMuhammadQureshi419/FYP" target="_blank" class="flex items-center bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
           GitHub
         </a>
-        <a href="license.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        <a href="https://github.com/ShahMuhammadQureshi419/FYP/blob/main/LICENSE" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
           View LICENSE
         </a>
       </div>
     </div>
   </header>
 
-  <div class="h-20"></div>
+  <div class="h-20"></div> <!-- Spacer for fixed header -->
 
-  <main class="max-w-6xl mx-auto p-6 animate-fade">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto p-6 animate-fade">
 
-      <!-- About Section -->
-      <section>
-        <div class="flex items-center space-x-4 mb-6">
-          <img src="/static/how-to-remove-malware-on-android-1536x1015-Photoroom.png" alt="How to Remove Malware on Android" class="w-20 h-20 rounded-full shadow-md">
-          <h2 class="text-4xl font-bold text-blue-700 dark:text-blue-400 orbitron">InfectTest</h2>
+    <!-- Upload Box -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <h2 class="text-2xl font-bold text-blue-700 dark:text-blue-400 font-orbitron mb-4 text-center">Upload APK for Analysis</h2>
+      <form id="upload-form" onsubmit="uploadAPK(event)" class="space-y-4">
+        <label for="file" class="drag-drop-area block rounded-lg">
+          <p class="text-lg font-medium text-blue-600 dark:text-blue-400">Drag & Drop APK here</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">or click to browse</p>
+          <input type="file" name="file" id="file" accept=".apk" required class="hidden">
+        </label>
+        <div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+            Upload & Analyze
+          </button>
         </div>
-        <p class="text-lg leading-relaxed mb-6">
-          InfectTest is an AI-powered Android malware detection framework engineered for comprehensive application analysis. It performs in-depth static and dynamic inspections of APKs to uncover suspicious API calls, permissions, and behaviors.
-        </p>
-        <h3 class="text-2xl font-semibold mb-3">Feature Highlights</h3>
-        <ul class="list-disc pl-5 space-y-2">
-          <li>Static code analysis to detect repackaging, obfuscation, and unsafe permissions</li>
-          <li>Dynamic behavior tracking through sandboxing and heuristic monitoring</li>
-          <li>AI-powered threat scoring and suspicious API detection</li>
-          <li>On-device and server-side scanning flexibility</li>
-          <li>PDF malware reports for documentation and research</li>
-        </ul>
-      </section>
-
-      <!-- Upload Section -->
-      <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-        <form method="POST" action="/upload" enctype="multipart/form-data" id="uploadForm">
-          <label for="fileInput" class="drag-drop-area block">
-            <p class="text-lg font-medium text-blue-600 dark:text-blue-400">Drag & Drop APK here</p>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">or click to browse</p>
-            <input type="file" name="file" id="fileInput" accept=".apk" required class="hidden">
-          </label>
-          <div class="mt-4">
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-              Upload APK
-            </button>
-          </div>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">Maximum file size: <strong>80MB</strong></p>
-
-          <!-- Upload Progress Bar -->
-          <div class="mt-4 hidden" id="progressWrapper">
-            <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-              <div id="progressBar" class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full w-0">0%</div>
-            </div>
-          </div>
-        </form>
-
-        <!-- Additional Insight Box -->
-        <div class="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md text-sm">
-          <h4 class="text-blue-600 dark:text-blue-300 font-semibold mb-2">Need help analyzing your APK?</h4>
-          <ul class="list-disc list-inside space-y-1">
-            <li>Use <strong>MobSF</strong> for a local in-depth scan.</li>
-            <li>Check VirusTotal to compare hash values.</li>
-            <li>Review permissions, services, and receivers carefully.</li>
-            <li>Be cautious of apps using reflection or dynamic code loading.</li>
-            <li>Submit unknown samples to our team for manual review.</li>
-          </ul>
-        </div>
-      </section>
+      </form>
+      <p id="status" class="text-center text-sm mt-4 text-gray-600 dark:text-gray-300"></p>
     </div>
+
+    <!-- About InfectTest -->
+    <section class="mt-12 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h3 class="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-2">What is InfectTest?</h3>
+      <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">
+        InfectTest is an AI-powered Android malware detection framework engineered for comprehensive application analysis.
+        It performs in-depth static and dynamic inspections of APKs to uncover suspicious API calls, permissions, and behaviors.
+      </p>
+      <h4 class="text-lg font-semibold text-blue-600 dark:text-blue-300 mb-2">Feature Highlights</h4>
+      <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+        <li>Static code analysis to detect repackaging, obfuscation, and unsafe permissions</li>
+        <li>Dynamic behavior tracking through sandboxing and heuristic monitoring</li>
+        <li>AI-powered threat scoring and suspicious API detection</li>
+        <li>On-device and server-side scanning flexibility</li>
+        <li>PDF malware reports for documentation and research</li>
+      </ul>
+    </section>
+
+    <!-- Help Tips -->
+    <section class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h4 class="text-lg font-semibold text-blue-600 dark:text-blue-300 mb-2">Need help analyzing your APK?</h4>
+      <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+        <li>Use <a href="https://github.com/MobSF/Mobile-Security-Framework-MobSF" target="_blank" class="text-blue-500 underline">MobSF</a> for a local in-depth scan.</li>
+        <li>Check <a href="https://www.virustotal.com/" target="_blank" class="text-blue-500 underline">VirusTotal</a> to compare hash values.</li>
+        <li>Review permissions, services, and receivers carefully.</li>
+        <li>Be cautious of apps using reflection or dynamic code loading.</li>
+        <li>Submit unknown samples to our team for manual review.</li>
+      </ul>
+    </section>
 
     <p class="text-center text-xs text-gray-400 mt-16">
       All rights reserved by FAST National University of Emerging Sciences.
     </p>
   </main>
 
+  <!-- Dark Mode Toggle Script -->
   <script>
     document.getElementById('darkModeToggle').addEventListener('click', () => {
       document.documentElement.classList.toggle('dark');
     });
 
-    // Upload progress handler
-    document.getElementById('uploadForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const fileInput = document.getElementById('fileInput');
-      const progressWrapper = document.getElementById('progressWrapper');
-      const progressBar = document.getElementById('progressBar');
-
-      if (!fileInput.files.length) return;
-
-      const xhr = new XMLHttpRequest();
-      const formData = new FormData(form);
-
-      xhr.open('POST', '/upload', true);
-
-      xhr.upload.onprogress = function(e) {
-        if (e.lengthComputable) {
-          const percentComplete = Math.round((e.loaded / e.total) * 100);
-          progressWrapper.classList.remove('hidden');
-          progressBar.style.width = percentComplete + '%';
-          progressBar.textContent = percentComplete + '%';
-        }
-      };
-
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          progressBar.textContent = 'Upload Complete';
-          progressBar.classList.add('bg-green-600');
-        } else {
-          progressBar.textContent = 'Upload Failed';
-          progressBar.classList.add('bg-red-600');
-        }
-      };
-
-      xhr.send(formData);
+    document.querySelector('.drag-drop-area').addEventListener('click', () => {
+      document.getElementById('file').click();
     });
   </script>
 </body>
