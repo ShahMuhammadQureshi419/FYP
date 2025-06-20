@@ -2,6 +2,7 @@
 ![Logo](https://github.com/user-attachments/assets/7065d725-ea8e-4342-ad87-b5cf14ec5ced)
 
 
+
 # InfectTest
 
 The global market's reach of Android devices makes the system a prime target for cyber criminals. In 2023 mobile malware attacks were reported by Kaspersky at a staggering 33.8 million, with a year over year increase of 52%. The Android operating system sustained the impact of these attacks accounting for 92% and being the primary victim. Outdated cybersecurity tools, relying on signature-based checks, struggle to detect polymorphic malware that skillfully evades static analysis.
