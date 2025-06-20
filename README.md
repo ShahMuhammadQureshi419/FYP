@@ -1,6 +1,8 @@
 
-![Logo](https://github.com/user-attachments/assets/7065d725-ea8e-4342-ad87-b5cf14ec5ced)
 
+<p align="left">
+  <img src="https://github.com/Binary-Assassin/InfectTest/blob/main/static/how-to-remove-malware-on-android-1536x1015-Photoroom.png" width="130" align="left" style="margin-right: 20px; border-radius: 12px;">
+</p>
 
 
 # InfectTest
