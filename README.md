@@ -26,9 +26,6 @@ This paper proposes a solution based on hybrid malware detection that integrates
 - [Documentation](#documentation)
 - [Authors](#authors)
 - [Installation](#installation)
-  - [Setting up Python 3.11](#setting-up-python311)
-  - [Verify the Installation](#verify-the-installation)
-  - [Run setup.sh Script](#run-setupsh-script)
 
 ---
 
