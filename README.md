@@ -20,7 +20,7 @@ This paper proposes a solution based on hybrid malware detection that integrates
 
 ## Table of Contents
 
-- [Introduction](#introduction)
+- [Introduction](#InfectTest)
 - [Appendix](#appendix)
 - [License](#license)
 - [Documentation](#documentation)
