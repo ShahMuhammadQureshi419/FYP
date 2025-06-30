@@ -11,11 +11,23 @@ The global market's reach of Android devices makes the system a prime target for
 
 This paper proposes a solution based on hybrid malware detection that integrates both static and dynamic analysis with artificial intelligence. We utilize AndroPyTool to execute applications within a safeguarded sandbox partitioned environment extracting runtime opcodes, API calls and permission which are executed. These outputs are used as input into a Random Forest for Multi classification which may accurately identify and categorize variants of malware with there families which includes adwares, SMSware and ransomware.
 
+<!-- badages -->
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![AndroPyTool](https://img.shields.io/badge/AndroPyTool-alexMyG-green)
+![MobSF](https://img.shields.io/badge/MobSF-red?logo=android)
+![AI Powered](https://img.shields.io/badge/AI-Powered-purple?logo=openai)
 
-## Appendix
 
-Any additional information goes here
+## Table of Contents
 
+- [Introduction](#InfectTest)
+- [Appendix](#appendix)
+- [License](#license)
+- [Documentation](#documentation)
+- [Authors](#authors)
+- [Installation](#installation)
+
+---
 
 ## License
 
@@ -77,4 +89,9 @@ sudo make altinstall
 # Run setup script
 > sudo ./setup.sh
 ```
+
+
+## Appendix
+
+Any additional information goes here
 
